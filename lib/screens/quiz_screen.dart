@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:quiz/screens/result_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:quiz/utility/progress_circle.dart';
+import 'package:quiz/utility/option_buttons.dart';
 
 class QuizScreen extends StatefulWidget {
   @override
@@ -12,6 +14,7 @@ class _QuizScreenState extends State<QuizScreen> {
   List questions = [];
   int currentQuestionIndex = 0;
   int score = 0;
+  int? selectedOptionId;
 
   @override
   void initState() {
@@ -32,7 +35,10 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  void checkAnswer(bool isCorrect) {
+  void onNextQuestion() {
+    final isCorrect = questions[currentQuestionIndex]['options']
+        .firstWhere((option) => option['id'] == selectedOptionId)['is_correct'];
+
     if (isCorrect) {
       score += 4; // Correct answer marks
     } else {
@@ -42,6 +48,8 @@ class _QuizScreenState extends State<QuizScreen> {
     if (currentQuestionIndex < questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
+        selectedOptionId =
+            null; // Reset the selected option for the next question
       });
     } else {
       Navigator.push(
@@ -70,6 +78,14 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              // Add Progress Circle Here
+              child: ProgressCircle(
+                currentQuestionIndex: currentQuestionIndex,
+                totalQuestions: questions.length,
+              ),
+            ),
+            SizedBox(height: 40),
             Text(
               'Question ${currentQuestionIndex + 1}/${questions.length}',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -83,14 +99,30 @@ class _QuizScreenState extends State<QuizScreen> {
             Column(
               children: List<Widget>.generate(
                 question['options'].length,
-                (index) => RadioListTile(
-                  title: Text(question['options'][index]['description']),
-                  value: question['options'][index]['is_correct'],
-                  groupValue: null,
-                  onChanged: (value) => checkAnswer(value as bool),
-                ),
+                (index) {
+                  final option = question['options'][index];
+                  return QuizOptionButton(
+                    text: option['description'],
+                    isSelected: selectedOptionId == option['id'],
+                    onTap: () {
+                      setState(() {
+                        selectedOptionId = option['id'];
+                      });
+                    },
+                    index: index, // Pass the index to assign fixed colors
+                  );
+                },
               ),
             ),
+            Spacer(),
+            if (selectedOptionId !=
+                null) // Show the button only if an option is selected
+              ElevatedButton(
+                onPressed: onNextQuestion,
+                child: Text(currentQuestionIndex < questions.length - 1
+                    ? 'Next Question'
+                    : 'Finish Quiz'),
+              ),
           ],
         ),
       ),
