@@ -15,6 +15,7 @@ class _QuizScreenState extends State<QuizScreen> {
   int currentQuestionIndex = 0;
   int score = 0;
   int? selectedOptionId;
+  bool isAnswerChecked = false; // To track if the answer is checked
 
   @override
   void initState() {
@@ -35,21 +36,29 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  void onNextQuestion() {
-    final isCorrect = questions[currentQuestionIndex]['options']
-        .firstWhere((option) => option['id'] == selectedOptionId)['is_correct'];
+  void onCheckAnswer() {
+    if (selectedOptionId != null) {
+      final isCorrect = questions[currentQuestionIndex]['options'].firstWhere(
+          (option) => option['id'] == selectedOptionId)['is_correct'];
 
-    if (isCorrect) {
-      score += 4; // Correct answer marks
-    } else {
-      score -= 1; // Negative marks
+      if (isCorrect) {
+        score += 4; // Correct answer marks
+      } else {
+        score -= 1; // Negative marks
+      }
+
+      setState(() {
+        isAnswerChecked = true; // Mark the answer as checked
+      });
     }
+  }
 
+  void onNextQuestion() {
     if (currentQuestionIndex < questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
-        selectedOptionId =
-            null; // Reset the selected option for the next question
+        selectedOptionId = null;
+        isAnswerChecked = false; // Reset after moving to the next question
       });
     } else {
       Navigator.push(
@@ -65,21 +74,27 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     if (questions.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text('Quiz')),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(
+          title: Text('Quiz'),
+          backgroundColor: Colors.teal.shade900,
+        ),
+        backgroundColor: Color.fromRGBO(19, 31, 36, 100),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
 
     final question = questions[currentQuestionIndex];
     return Scaffold(
-      appBar: AppBar(title: Text('Quiz')),
+      backgroundColor:
+          const Color.fromARGB(255, 19, 31, 36), // Dark teal background
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Add space above the progress circle
+            SizedBox(height: 60), // Adjust this value as needed
             Center(
-              // Add Progress Circle Here
               child: ProgressCircle(
                 currentQuestionIndex: currentQuestionIndex,
                 totalQuestions: questions.length,
@@ -88,12 +103,21 @@ class _QuizScreenState extends State<QuizScreen> {
             SizedBox(height: 40),
             Text(
               'Question ${currentQuestionIndex + 1}/${questions.length}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'BalsamiqSans',
+                color: Colors.white, // White text
+              ),
             ),
             SizedBox(height: 20),
             Text(
               question['description'] ?? '',
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white, // White text
+                fontFamily: 'BalsamiqSans',
+              ),
             ),
             SizedBox(height: 20),
             Column(
@@ -101,27 +125,51 @@ class _QuizScreenState extends State<QuizScreen> {
                 question['options'].length,
                 (index) {
                   final option = question['options'][index];
+                  final isCorrect = option['is_correct'];
+                  final isSelectedIncorrect =
+                      selectedOptionId == option['id'] && !isCorrect;
+
                   return QuizOptionButton(
                     text: option['description'],
                     isSelected: selectedOptionId == option['id'],
+                    isAnswerChecked: isAnswerChecked,
+                    isCorrect: isCorrect,
+                    isSelectedIncorrect:
+                        isSelectedIncorrect, // Pass if this option is incorrectly selected
                     onTap: () {
                       setState(() {
                         selectedOptionId = option['id'];
                       });
                     },
-                    index: index, // Pass the index to assign fixed colors
+                    index: index,
                   );
                 },
               ),
             ),
             Spacer(),
-            if (selectedOptionId !=
-                null) // Show the button only if an option is selected
+            if (selectedOptionId != null && !isAnswerChecked)
+              ElevatedButton(
+                onPressed: onCheckAnswer,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 147, 211, 51),
+                  foregroundColor: Colors.white,
+                  textStyle: TextStyle(fontFamily: 'BalsamiqSans'),
+                ),
+                child: Text('Check Answer'),
+              ),
+            if (isAnswerChecked)
               ElevatedButton(
                 onPressed: onNextQuestion,
-                child: Text(currentQuestionIndex < questions.length - 1
-                    ? 'Next Question'
-                    : 'Finish Quiz'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 147, 211, 51),
+                  foregroundColor: Colors.white,
+                  textStyle: TextStyle(fontFamily: 'BalsamiqSans'),
+                ),
+                child: Text(
+                  currentQuestionIndex < questions.length - 1
+                      ? 'Next Question'
+                      : 'Finish Quiz',
+                ),
               ),
           ],
         ),

@@ -3,39 +3,55 @@ import 'package:flutter/material.dart';
 class QuizOptionButton extends StatelessWidget {
   final String text;
   final bool isSelected;
+  final bool isAnswerChecked; // Check if the answer is checked
+  final bool isCorrect; // Check if the option is correct
   final VoidCallback onTap;
   final int index;
+  final bool
+      isSelectedIncorrect; // Whether this option is selected but incorrect
 
   QuizOptionButton({
     required this.text,
     required this.isSelected,
     required this.onTap,
     required this.index,
+    required this.isAnswerChecked,
+    required this.isCorrect,
+    required this.isSelectedIncorrect, // Add this to check if the option is incorrect
   });
 
   @override
   Widget build(BuildContext context) {
+    Color backgroundColor = Colors.transparent;
+    Color borderColor = Colors.white;
+
+    if (isAnswerChecked) {
+      // Color only the selected incorrect option in red
+      if (isSelectedIncorrect) {
+        backgroundColor = Colors.red.withOpacity(0.3);
+        borderColor = Colors.red; // Red border for incorrect answer
+      } else if (isCorrect) {
+        // Correct option will be green
+        backgroundColor = Color.fromARGB(255, 147, 211, 51).withOpacity(0.2);
+        borderColor = Color.fromARGB(
+            255, 147, 211, 51); // Green border for correct answer
+      }
+    } else if (isSelected) {
+      backgroundColor = Colors.blue.withOpacity(0.2); // Mild blue when selected
+      borderColor = Colors.blueAccent; // Blue border when selected
+    }
+
     return AnimatedContainer(
       duration: Duration(milliseconds: 200),
       curve: Curves.easeInOut,
       margin: EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
-        color: isSelected
-            ? Colors.blueAccent.withOpacity(0.2) // Highlight selected option
-            : _getFixedPastelColor(index),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(12.0),
-        border: isSelected
-            ? Border.all(color: Colors.blueAccent, width: 2.0)
-            : Border.all(color: Colors.transparent),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: Colors.blueAccent.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                ),
-              ]
-            : [],
+        border: Border.all(
+          color: borderColor, // Use dynamic border color
+          width: 2.0,
+        ),
       ),
       child: Material(
         color: Colors.transparent,
@@ -50,7 +66,8 @@ class QuizOptionButton extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontSize: 16.0,
-                  color: Colors.black87,
+                  color: Colors.white, // White text for better visibility
+                  fontFamily: 'BalsamiqSans', // Apply custom font
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
