@@ -23,7 +23,7 @@ class QuizOptionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color backgroundColor = Colors.transparent;
-    Color borderColor = Colors.white;
+    Color borderColor = Colors.white.withOpacity(0.3);
 
     if (isAnswerChecked) {
       // Color only the selected incorrect option in red

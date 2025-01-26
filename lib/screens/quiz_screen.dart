@@ -42,9 +42,7 @@ class _QuizScreenState extends State<QuizScreen> {
           (option) => option['id'] == selectedOptionId)['is_correct'];
 
       if (isCorrect) {
-        score += 4; // Correct answer marks
-      } else {
-        score -= 1; // Negative marks
+        score += 1; // Correct answer marks
       }
 
       setState(() {
@@ -74,13 +72,13 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     if (questions.isEmpty) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('Quiz'),
-          backgroundColor: Colors.teal.shade900,
-        ),
-        backgroundColor: Color.fromRGBO(19, 31, 36, 100),
-        body: Center(child: CircularProgressIndicator(color: Colors.white)),
-      );
+          // appBar: AppBar(
+          //   title: Text('Quiz'),
+          //   backgroundColor: Colors.teal.shade900,
+          // ),
+          // backgroundColor: Color.fromRGBO(19, 31, 36, 100),
+          // body: Center(child: CircularProgressIndicator(color: Colors.white)),
+          );
     }
 
     final question = questions[currentQuestionIndex];
