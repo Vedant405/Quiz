@@ -52,13 +52,13 @@ The app fetches quiz questions from the following API:
 ## Screenshots
 
 ### Home Screen
-![Home Screen](screenshots/home_screen.png.jpg)
+![Home Screen](home_screen.png.jpg)
 
 ### Quiz Screen
-![Quiz Screen](screenshots/quiz_screen.png.jpg)
+![Quiz Screen](quiz_screen.png.jpg)
 
 ### Result Screen
-![Result Screen](screenshots/result_screen.png.jpg)
+![Result Screen](result_screen.png.jpg)
 
 ---
 
