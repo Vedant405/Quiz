@@ -65,7 +65,7 @@ The app fetches quiz questions from the following API:
 
 ## Video Walkthrough
 
-[Click here to view the video walkthrough](video_link_here)
+[Click here to view the video walkthrough](https://youtube.com/shorts/YbqC8Rsfffw?feature=share)
 
 ---
 
